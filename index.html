@@ -78,11 +78,30 @@
             const div = document.createElement("div")
             const canvas = document.createElement("canvas");
             canvas.setAttribute("id", `chart-${idx})`);
-            canvas.setAttribute("height", "200px");
+            div.setAttribute("style", "height: 200px");
             const heading = document.createElement("H4");
             const section = sections[idx]
+            const currentLevelElement = document.createElement("p")
+
+            const latestValue = measure.items[0].value
+            if (latestValue < section.scrape) {
+                currentLevel = 'empty'
+            } else if (latestValue < section.low) {
+                currentLevel = 'scrape'
+            } else if (latestValue < section.medium) {
+                currentLevel = 'low'
+            } else if (latestValue < section.high) {
+                currentLevel = 'medium'
+            } else if (latestValue < section.huge) {
+                currentLevel = 'high'
+            } else {
+                currentLevel = 'huge'
+            }
+
+            currentLevelElement.appendChild(document.createTextNode(`Current level: ${currentLevel}`))
             heading.appendChild(document.createTextNode(`${section.river} - ${section.section}`))
-            div.appendChild(heading)
+            document.body.appendChild(heading)
+            document.body.appendChild(currentLevelElement)
             div.appendChild(canvas)
             document.body.appendChild(div)
 
@@ -110,6 +129,7 @@
                         }]
                     },
                     options: {
+                        maintainAspectRatio: false,
                         elements: {
                             line: { borderColor: '#3F84E6', order: 10 },
                             point: {
