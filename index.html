@@ -22,8 +22,9 @@
 
 <body>
     <script>
-        const d = new Date();
-        d.setDate(d.getDate() - 5);
+        const since = new Date();
+        since.setDate(since.getDate() - 5);
+        const now = new Date();
 
         sections = [
             {
@@ -69,7 +70,7 @@
         ]
 
         Promise.all(sections.map(s => {
-            return fetch(`https://environment.data.gov.uk/flood-monitoring/id/measures/${s.measure}/readings/?since=${d.toISOString()}&_sorted`,
+            return fetch(`https://environment.data.gov.uk/flood-monitoring/id/measures/${s.measure}/readings/?since=${since.toISOString()}&_sorted`,
                 {
                     method: "GET"
                 }
@@ -98,7 +99,7 @@
                 currentLevel = 'huge'
             }
 
-            currentLevelElement.appendChild(document.createTextNode(`Current level: ${currentLevel}`))
+            currentLevelElement.appendChild(document.createTextNode(`Current level: ${currentLevel} (${latestValue}, ${Math.round((now - Date.parse(measure.items[0].dateTime)) / 1000 / 60, 0)} mins ago)`))
             heading.appendChild(document.createTextNode(`${section.river} - ${section.section}`))
             document.body.appendChild(heading)
             document.body.appendChild(currentLevelElement)
