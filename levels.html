@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>River Levels NE</title>
+    <meta name="description" content="Kayaking River Levels in the North East">
+    <meta name="keywords" content="kayaking levels north east">
+</head>
+
+<body>
+    <script>
+        const d = new Date();
+        d.setDate(d.getDate() - 5);
+        fetch(`https://environment.data.gov.uk/flood-monitoring/id/measures/1491TH-level-stage-i-15_min-mASD/readings/?since=${d.toISOString()}`,
+            {
+                method: "GET"
+            }
+        )
+            .then((response) => response.json())
+            .then((data) => console.log(data));
+    </script>
+</body>
+
+</html>
