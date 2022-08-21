@@ -5,6 +5,11 @@
     <title>River Levels NE</title>
     <meta name="description" content="Kayaking River Levels in the North East">
     <meta name="keywords" content="kayaking levels north east">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+
 </head>
 
 <body>
@@ -19,12 +24,55 @@
         ]
 
         Promise.all(measures.map(m => {
-            return fetch(`https://environment.data.gov.uk/flood-monitoring/id/measures/${m}/readings/?since=${d.toISOString()}`,
+            return fetch(`https://environment.data.gov.uk/flood-monitoring/id/measures/${m}/readings/?since=${d.toISOString()}&_sorted`,
                 {
                     method: "GET"
                 }
             ).then((response) => response.json())
-        })).then(levels => console.log(levels))
+        })).then(levels => levels.forEach((gauge, idx) => {
+            const div = document.createElement("div")
+            const canvas = document.createElement("canvas");
+            canvas.setAttribute("id", `chart-${idx})`);
+            canvas.setAttribute("height", "100px");
+            const heading = document.createElement("H2");
+            heading.appendChild(document.createTextNode(measures[idx]))
+            div.appendChild(heading)
+            div.appendChild(canvas)
+            document.body.appendChild(div)
+
+            const myChart = new Chart(
+                canvas,
+                {
+                    type: 'line',
+                    data: {
+                        datasets: [{
+                            data: gauge.items.map(p => {
+                                return { x: p.dateTime, y: p.value }
+                            })
+                        }]
+                    },
+                    options: {
+                        elements: {
+                            line: { borderColor: '#3F84E6' },
+                            point: {
+                                radius: 0
+                            }
+                        },
+                        scales: {
+                            x: {
+                                type: 'time',
+                                time: { unit: 'day' }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            );
+        }))
 
     </script>
 </body>
