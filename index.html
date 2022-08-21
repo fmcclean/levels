@@ -10,7 +10,14 @@
     <script
         src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <script
+        src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+    <style>
+        body {
+            background-color: linen;
+            font-family: Arial
+        }
+    </style>
 </head>
 
 <body>
@@ -71,13 +78,26 @@
             const div = document.createElement("div")
             const canvas = document.createElement("canvas");
             canvas.setAttribute("id", `chart-${idx})`);
-            canvas.setAttribute("height", "100px");
+            canvas.setAttribute("height", "200px");
             const heading = document.createElement("H4");
-            heading.appendChild(document.createTextNode(`${sections[idx].river} - ${sections[idx].section}`))
+            const section = sections[idx]
+            heading.appendChild(document.createTextNode(`${section.river} - ${section.section}`))
             div.appendChild(heading)
             div.appendChild(canvas)
             document.body.appendChild(div)
 
+            const opacity = 0.3
+            const params = { type: 'box', adjustScaleRange: true, borderWidth: 0.1 }
+
+            annotations = {
+                empty: { ...params, yMax: section.scrape, backgroundColor: `rgba(247, 95, 95, ${opacity})` },
+                scrape: { ...params, yMin: section.scrape, yMax: section.low, backgroundColor: `rgba(255, 171, 171, ${opacity})` },
+                low: { ...params, yMin: section.low, yMax: section.medium, backgroundColor: `rgba(243, 239, 111, ${opacity})` },
+                medium: { ...params, yMin: section.medium, yMax: section.high, backgroundColor: `rgba(197, 247, 179, ${opacity})` },
+                high: { ...params, yMin: section.high, yMax: section.huge, backgroundColor: `rgba(46, 137, 14, ${opacity})` },
+                huge: { ...params, yMin: section.huge, backgroundColor: `rgba(201, 105, 255, ${opacity})` }
+
+            }
             const myChart = new Chart(
                 canvas,
                 {
@@ -86,12 +106,12 @@
                         datasets: [{
                             data: measure.items.map(p => {
                                 return { x: p.dateTime, y: p.value }
-                            })
+                            }),
                         }]
                     },
                     options: {
                         elements: {
-                            line: { borderColor: '#3F84E6' },
+                            line: { borderColor: '#3F84E6', order: 10 },
                             point: {
                                 radius: 0
                             }
@@ -105,6 +125,9 @@
                         plugins: {
                             legend: {
                                 display: false
+                            },
+                            annotation: {
+                                annotations: annotations
                             }
                         }
                     }
