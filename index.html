@@ -17,6 +17,27 @@
             background-color: linen;
             font-family: Arial
         }
+
+        .loader {
+            border: 6px solid linen;
+            border-top: 6px solid grey;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 
@@ -79,6 +100,10 @@
             },
         ]
 
+        const loader = document.createElement("div")
+        loader.className = 'loader'
+        document.body.appendChild(loader)
+
         Promise.all(sections.map(s => {
             return fetch(`https://environment.data.gov.uk/flood-monitoring/id/measures/${s.measure}/readings/?since=${since.toISOString()}&_sorted`,
                 {
@@ -86,6 +111,7 @@
                 }
             ).then((response) => response.json())
         })).then(levels => levels.forEach((measure, idx) => {
+            loader.remove()
             const div = document.createElement("div")
             const canvas = document.createElement("canvas");
             canvas.setAttribute("id", `chart-${idx})`);
